@@ -1,4 +1,12 @@
+import dns from "node:dns";
 import { MongoClient } from "mongodb";
+
+// 일부 Windows 환경에서 Node가 DNS 서버를 127.0.0.1로만 잡아
+// mongodb+srv 주소의 SRV 조회가 ECONNREFUSED로 실패함 → 그때만 공용 DNS 사용
+const isLoopback = (s: string) => s.startsWith("127.") || s === "::1";
+if (dns.getServers().every(isLoopback)) {
+  dns.setServers(["1.1.1.1", "8.8.8.8"]);
+}
 
 declare global {
   // eslint-disable-next-line no-var
