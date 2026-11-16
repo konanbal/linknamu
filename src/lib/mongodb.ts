@@ -11,7 +11,11 @@ function getMongoClient(): Promise<MongoClient> | null {
   if (!uri) return null;
   // 개발 모드 핫 리로드에서도 연결을 재사용하도록 global에 캐시
   if (!global._mongoClientPromise) {
-    global._mongoClientPromise = new MongoClient(uri).connect();
+    global._mongoClientPromise = new MongoClient(uri).connect().catch((err) => {
+      // 연결 실패를 캐시해 두면 영영 재시도하지 않으므로 비워 둠
+      global._mongoClientPromise = undefined;
+      throw err;
+    });
   }
   return global._mongoClientPromise;
 }

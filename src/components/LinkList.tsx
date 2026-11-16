@@ -5,14 +5,21 @@ import type { LinkItem } from "@/data/profile";
 import LinkCard from "./LinkCard";
 
 export default function LinkList({ links }: { links: LinkItem[] }) {
-  // null이면 클릭 집계 비활성화(DB 미설정) 상태
-  const [counts, setCounts] = useState<Record<string, number> | null>(null);
+  // 데이터를 받기 전에는 모두 0회로 표시
+  const [counts, setCounts] = useState<Record<string, number>>({});
 
+  // 페이지가 열릴 때 모든 링크의 클릭 수를 한 번에 가져옴
   useEffect(() => {
     fetch("/api/clicks")
-      .then((res) => res.json())
+      .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
-        if (data.enabled) setCounts(data.counts);
+        if (!data?.enabled) return;
+        // 응답 전에 누른 클릭이 덮어써지지 않도록 큰 값을 유지
+        setCounts((prev) => {
+          const next = { ...data.counts };
+          for (const [id, n] of Object.entries(prev)) next[id] = Math.max(next[id] ?? 0, n);
+          return next;
+        });
       })
       .catch(() => {});
   }, []);
@@ -25,9 +32,8 @@ export default function LinkList({ links }: { links: LinkItem[] }) {
       body: JSON.stringify({ linkId }),
       keepalive: true,
     }).catch(() => {});
-    setCounts((prev) =>
-      prev ? { ...prev, [linkId]: (prev[linkId] ?? 0) + 1 } : prev
-    );
+    // 화면에는 즉시 +1 반영
+    setCounts((prev) => ({ ...prev, [linkId]: (prev[linkId] ?? 0) + 1 }));
   };
 
   return (
@@ -37,7 +43,7 @@ export default function LinkList({ links }: { links: LinkItem[] }) {
           <LinkCard
             title={link.title}
             url={link.url}
-            count={counts ? counts[link.id] ?? 0 : undefined}
+            count={counts[link.id] ?? 0}
             onClick={() => handleClick(link.id)}
           />
         </li>
