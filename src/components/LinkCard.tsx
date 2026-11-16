@@ -12,11 +12,11 @@ export default function LinkCard({ title, url, count, onClick }: Props) {
       target="_blank"
       rel="noopener noreferrer"
       onClick={onClick}
-      className="flex w-full items-center justify-between rounded-2xl border border-slate-200 bg-white px-5 py-4 font-medium shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-400 hover:shadow-md active:translate-y-0 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-emerald-500"
+      className="relative flex w-full items-center justify-center rounded-3xl border border-white/70 bg-white/45 px-14 py-[1.125rem] font-semibold shadow-[0_6px_24px_-12px_rgba(140,80,40,0.25)] backdrop-blur-xl transition duration-300 ease-out hover:-translate-y-px hover:bg-white/65 hover:shadow-[0_10px_28px_-12px_rgba(140,80,40,0.32)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-300 dark:border-white/10 dark:bg-white/[0.06] dark:shadow-[0_6px_24px_-12px_rgba(0,0,0,0.6)] dark:hover:bg-white/[0.1]"
     >
       <span className="truncate">{title}</span>
       {typeof count === "number" && (
-        <span className="ml-3 shrink-0 text-xs text-slate-500 dark:text-slate-400">
+        <span className="absolute right-5 text-xs font-normal tabular-nums text-stone-400 dark:text-stone-500">
           {count.toLocaleString()}회
         </span>
       )}
